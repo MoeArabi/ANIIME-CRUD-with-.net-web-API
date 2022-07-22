@@ -1,59 +1,60 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
+using AnimeInternship.API.Models;
+
 using Microsoft.AspNetCore.Mvc;
 
-namespace ANIIME.Controllers
+namespace AnimeInternship.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AnimeController : ControllerBase
-    { private static  List<ANIME> Animes=new List<ANIME>
-    { 
-                new ANIME {Id = 1, Name="OnePiece",MCName="Luffy",seasons=20 },
-                new ANIME {Id = 2, Name="Naruto Shippuden",MCName="Naruto",seasons=15 }
-            };
+    {
+
+        private static List<Anime> AnimeList = new()
+         {
+             new(1, "OnePiece", "Luffy", 20 ),
+             new(2, "Naruto Shippuden", "Naruto", 15)
+         };
+
         [HttpGet]
-        public async Task<ActionResult<List<ANIME>>> Get()
-        { 
-        return Ok(Animes);
-        }
+        public async Task<ActionResult<List<Anime>>> Get()
+            => Ok(AnimeList);
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<List<ANIME>>> Get(int id)
-        {  var anime= Animes.Find( H=>H.Id==id);
+        public async Task<ActionResult<List<Anime>>> GetById(int id)
+        {
+            //You're trying to find an anime not a hero so u do a=> a. not H
+            var anime = AnimeList.Find(a => a.Id == id);
             if (anime == null)
                 return BadRequest("Anime not found.");
             return Ok(anime);
         }
 
         [HttpPost]
-        public async Task<ActionResult<List<ANIME>>> Addanime(ANIME anime)
+        public async Task<ActionResult<List<Anime>>> AddAnime(Anime anime)
         {
-            Animes.Add(anime);
-           
-
-            return Ok(Animes);
+            AnimeList.Add(anime);
+            return Ok(AnimeList);  
         }
 
         [HttpPut]
-        public async Task<ActionResult<List<ANIME>>> UpdateHero(ANIME request)
+        public async Task<ActionResult<List<Anime>>> UpdateHero(Anime request)
         {
-            var anime = Animes.Find(H => H.Id == request.Id);
+            //same like above?
+            var anime = AnimeList.Find(a => a.Id == request.Id);
             if (anime == null)
                 return BadRequest("Hero not found.");
-
-            anime.Name = request.Name;
-            anime.MCName = request.MCName;
-            anime.seasons = request.seasons;
-           
-
-            return Ok(Animes);
+            anime.Update(request.Name, request.MCName, request.Seasons);
+            return Ok(AnimeList);
         }
+
         [HttpDelete("{id}")]
-            public async Task<ActionResult<List<ANIME>>> Delete(int id)
+        public async Task<ActionResult<List<Anime>>> Delete(int id)
         {
-            var anime = Animes.Find(H => H.Id == id);
+            var anime = AnimeList.Find(a => a.Id == id);
             if (anime == null)
                 return BadRequest("Anime not found.");
-            Animes.Remove(anime);
+            AnimeList.Remove(anime);
             return Ok(anime);
         }
     }
